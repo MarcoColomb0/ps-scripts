@@ -5,7 +5,7 @@ $esxiHost = "10.0.1.10"
 $cred = Get-Credential
 
 # Import the CSV file which contains details for Port Groups
-$csv = Import-Csv -Path "pg_input.csv"
+$csv = Import-Csv -Path "sensitive_pg_input.csv"
 
 # Connect to the ESXi host using the credentials
 try {
