@@ -2,7 +2,7 @@
 $esxiHost = "10.0.1.10"
 
 # Prompt for user credentials
-$cred = Get-Credential # Prompts for Username and Password
+$cred = Get-Credential
 
 # Import the CSV file which contains details for Port Groups
 $csv = Import-Csv -Path "pg_input.csv"
@@ -19,10 +19,10 @@ try {
 
         if (!$checkSwitch) {
             Write-Host "vSwitch" $vSwitchName "not found on host" $esxiHost -ForegroundColor Red
-            continue  # Skip to the next configuration
+            continue
         }
 
-        # Process each Port Group configuration from the CSV
+        # Process each Port Group from the CSV
         $portGroupName = $config.PortGroupName
         $vlanID = [int]$config.VLANID
 
@@ -30,12 +30,10 @@ try {
         $checkPortGroup = Get-VMHost -Name $esxiHost | Get-VirtualSwitch -Name $vSwitchName | Get-VirtualPortGroup | Where-Object { $_.Name -eq $portGroupName }
 
         if (!$checkPortGroup) {
-            # If the Port Group doesn't exist, create it
+            # If the port groups doesn't exist - create it
             try {
                 Get-VMHost -Name $esxiHost | Get-VirtualSwitch -Name $vSwitchName | New-VirtualPortGroup -Name $portGroupName -VLanId $vlanID | Out-Null
                 Write-Host "Creating Port Group" $portGroupName "with VLAN ID" $vlanID "on vSwitch" $vSwitchName -ForegroundColor Green
-                
-                # Security settings are not applied here, as they will inherit from the vSwitch
                 Write-Host "Port Group" $portGroupName "created successfully." -ForegroundColor Green
             } catch {
                 Write-Host "Error creating Port Group" $portGroupName "on vSwitch" $vSwitchName "Error Message: $_" -ForegroundColor Red
